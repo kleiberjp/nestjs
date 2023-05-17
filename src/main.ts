@@ -1,10 +1,27 @@
-import { NestFactory } from '@nestjs/core';
-import cors from 'cors';
-import { AppModule } from './app.module';
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { NestFactory, Reflector } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+
+import { AppModule } from '@/app.module';
+import { HttpExceptionFilter } from '@/exception-filter';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, { cors: true });
+  const app = await NestFactory.create(AppModule, {});
+
+  app.enableCors({
+    origin: '*'
+  });
+
+  const config = new DocumentBuilder()
+    .setTitle('Inveka API')
+    .setDescription('REST API For Inveka')
+    .setVersion('1.0')
+    .build();
+
+  const document = SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('api', app, document);
 
   await app.listen(5019);
 }
+
 bootstrap();
